@@ -125,7 +125,7 @@ class BertMCAttributionPredictor(Predictor):
                 util.combine_initial_dims(instance2_tensors['segment_ids'])
             ).clone().detach()
 
-        grad_total = torch.zeros_like(real_embedding_values)
+        grad_total = torch.zeros_like(real_embedding_values, device=self._device)
         # get baseline output
         self._fake_embeddings.embedding_values = torch.nn.Parameter(baseline_embedding_values)
         baseline_outputs = self._model.forward(**instance_tensors)
