@@ -132,6 +132,7 @@ class BertMCAttributionPredictor(Predictor):
         baseline_loss = baseline_outputs['loss'].item()
         baseline_outputs['loss'].backward()
         print(self._grad)
+        quit()
         del baseline_outputs
         final_loss = 0
         for i in tqdm(range(self.grad_sample_count)):
