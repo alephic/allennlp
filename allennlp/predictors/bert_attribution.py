@@ -127,7 +127,7 @@ class BertMCAttributionPredictor(Predictor):
 
         grad_total = torch.zeros_like(real_embedding_values)
         # get baseline output
-        self._fake_embeddings.embedding_values = real_embedding_values
+        self._fake_embeddings.embedding_values = (real_embedding_values + baseline_embedding_values)*0.5
         baseline_outputs = self._model.forward(**instance_tensors)
         baseline_loss = baseline_outputs['loss'].item()
         baseline_outputs['loss'].backward()
