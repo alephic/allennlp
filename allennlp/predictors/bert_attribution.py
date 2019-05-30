@@ -108,7 +108,7 @@ class BertMCAttributionPredictor(Predictor):
         ).clone().detach().requires_grad_(True)
         baseline_embedding_values = None
         if self.baseline_type == 'zeros':
-            baseline_embedding_values = torch.zeros_like(real_embedding_values)
+            baseline_embedding_values = torch.zeros_like(real_embedding_values).requires_grad_(True)
         else:
             instance2, _ = self._my_json_to_instance(inputs)
             if self.baseline_type == 'all_mask':
@@ -127,7 +127,7 @@ class BertMCAttributionPredictor(Predictor):
 
         grad_total = torch.zeros_like(real_embedding_values)
         # get baseline output
-        self._fake_embeddings.embedding_values = baseline_embedding_values
+        self._fake_embeddings.embedding_values = real_embedding_values
         baseline_outputs = self._model.forward(**instance_tensors)
         baseline_loss = baseline_outputs['loss'].item()
         baseline_outputs['loss'].backward()
