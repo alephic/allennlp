@@ -130,6 +130,8 @@ class BertMCAttributionPredictor(Predictor):
         self._fake_embeddings.embedding_values = baseline_embedding_values
         baseline_outputs = self._model.forward(**instance_tensors)
         baseline_loss = baseline_outputs['loss'].item()
+        baseline_outputs['loss'].backward()
+        print(self._grad)
         del baseline_outputs
         final_loss = 0
         for i in tqdm(range(self.grad_sample_count)):
