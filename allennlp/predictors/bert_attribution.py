@@ -17,7 +17,7 @@ from tqdm import tqdm
 class FakeBertEmbeddings(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        self.embedding_values = None
+        self.embedding_values = torch.nn.Parameter(torch.tensor(0.0))
     def forward(self, input_ids, token_type_ids=None):
         return self.embedding_values
 
@@ -105,7 +105,7 @@ class BertMCAttributionPredictor(Predictor):
         real_embedding_values = self._real_embeddings(
             util.combine_initial_dims(instance_tensors['question']['tokens']),
             util.combine_initial_dims(instance_tensors['segment_ids'])
-        ).clone().detach().requires_grad_(True)
+        ).clone().detach()
         baseline_embedding_values = None
         if self.baseline_type == 'zeros':
             baseline_embedding_values = torch.zeros_like(real_embedding_values).requires_grad_(True)
@@ -123,11 +123,11 @@ class BertMCAttributionPredictor(Predictor):
             baseline_embedding_values = self._real_embeddings(
                 util.combine_initial_dims(instance2_tensors['question']['tokens']),
                 util.combine_initial_dims(instance2_tensors['segment_ids'])
-            ).clone().detach().requires_grad_(True)
+            ).clone().detach()
 
         grad_total = torch.zeros_like(real_embedding_values)
         # get baseline output
-        self._fake_embeddings.embedding_values = (real_embedding_values + baseline_embedding_values)*0.5
+        self._fake_embeddings.embedding_values = torch.nn.Parameter(baseline_embedding_values)
         baseline_outputs = self._model.forward(**instance_tensors)
         baseline_loss = baseline_outputs['loss'].item()
         baseline_outputs['loss'].backward()
