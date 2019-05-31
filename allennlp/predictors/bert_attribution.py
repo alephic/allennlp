@@ -101,7 +101,7 @@ class BertMCAttributionPredictor(Predictor):
         instance_batch = Batch([instance])
         instance_batch.index_instances(self._model.vocab)
         instance_tensors = util.tensor_dict_to_device(instance_batch.as_tensor_dict(), self._device)
-
+        print(instance_tensors.device)
         real_embedding_values = self._real_embeddings(
             util.combine_initial_dims(instance_tensors['question']['tokens']),
             util.combine_initial_dims(instance_tensors['segment_ids'])
