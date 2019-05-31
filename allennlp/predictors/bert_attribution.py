@@ -108,7 +108,7 @@ class BertMCAttributionPredictor(Predictor):
         ).clone().detach()
         baseline_embedding_values = None
         if self.baseline_type == 'zeros':
-            baseline_embedding_values = torch.zeros_like(real_embedding_values).requires_grad_(True)
+            baseline_embedding_values = torch.zeros_like(real_embedding_values, device=self._device).requires_grad_(True)
         else:
             instance2, _ = self._my_json_to_instance(inputs)
             if self.baseline_type == 'all_mask':
@@ -120,6 +120,7 @@ class BertMCAttributionPredictor(Predictor):
             instance2_batch = Batch([instance2])
             instance2_batch.index_instances(self._model.vocab)
             instance2_tensors = util.tensor_dict_to_device(instance2_batch.as_tensor_dict(), self._device)
+            print(instance2_tensors.device)
             baseline_embedding_values = self._real_embeddings(
                 util.combine_initial_dims(instance2_tensors['question']['tokens']),
                 util.combine_initial_dims(instance2_tensors['segment_ids'])
