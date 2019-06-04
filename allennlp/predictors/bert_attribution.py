@@ -17,7 +17,7 @@ from tqdm import tqdm
 class FakeBertEmbeddings(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        self.embedding_values = torch.nn.Parameter(torch.tensor(0.0))
+        self.embedding_values = None
     def forward(self, input_ids, token_type_ids=None):
         return self.embedding_values
 
@@ -29,17 +29,17 @@ class BertMCAttributionPredictor(Predictor):
     def __init__(self, model, dataset_reader, grad_sample_count=100, baseline_type='cls_sep_mask'):
         super().__init__(model, dataset_reader)
         self._grad = None
+        self._device = next(self._model.parameters()).device
         self._model.eval()
         self._real_embeddings = self._model._bert_model.embeddings
         self._fake_embeddings = FakeBertEmbeddings()
-        self._fake_embeddings.register_backward_hook(self.collect_grad)
+        self._fake_embeddings.to(self._device)
         self._model._bert_model.embeddings = self._fake_embeddings
         self.grad_sample_count = grad_sample_count
         self.baseline_type = baseline_type
-        self._device = next(self._model.parameters()).device
 
-    def collect_grad(self, embedding_module, grad_input, grad_output):
-        self._grad = grad_output[0]
+    def collect_grad(self, grad):
+        self._grad = grad
 
     def _my_json_to_instance(self, json_dict: JsonDict) -> Tuple[Instance, JsonDict]:
         """
@@ -95,6 +95,10 @@ class BertMCAttributionPredictor(Predictor):
         instance, _ = self._my_json_to_instance(json_dict)
         return instance
 
+    def update_fake_embedding_values(self, new_values):
+        new_values.register_hook(self.collect_grad)
+        self._fake_embeddings.embedding_values = new_values
+
     @overrides
     def predict_json(self, inputs: JsonDict) -> JsonDict:
         instance, return_dict = self._my_json_to_instance(inputs)
@@ -104,7 +108,7 @@ class BertMCAttributionPredictor(Predictor):
         real_embedding_values = self._real_embeddings(
             util.combine_initial_dims(instance_tensors['question']['tokens']),
             util.combine_initial_dims(instance_tensors['segment_ids'])
-        ).clone().detach()
+        ).clone().detach().requires_grad_(True)
         baseline_embedding_values = None
         if self.baseline_type == 'zeros':
             baseline_embedding_values = torch.zeros_like(real_embedding_values, device=self._device).requires_grad_(True)
@@ -122,22 +126,20 @@ class BertMCAttributionPredictor(Predictor):
             baseline_embedding_values = self._real_embeddings(
                 util.combine_initial_dims(instance2_tensors['question']['tokens']),
                 util.combine_initial_dims(instance2_tensors['segment_ids'])
-            ).clone().detach()
+            ).clone().detach().requires_grad_(True)
 
         grad_total = torch.zeros_like(real_embedding_values, device=self._device)
         # get baseline output
-        self._fake_embeddings.embedding_values = torch.nn.Parameter(baseline_embedding_values)
+        self.update_fake_embedding_values(baseline_embedding_values)
         baseline_outputs = self._model.forward(**instance_tensors)
         baseline_loss = baseline_outputs['loss'].item()
         baseline_outputs['loss'].backward()
-        print(self._grad)
-        quit()
         del baseline_outputs
         final_loss = 0
         for i in tqdm(range(self.grad_sample_count)):
             embedding_value_diff = real_embedding_values - baseline_embedding_values
             interpolated_embedding_values = baseline_embedding_values + ((i+1)/self.grad_sample_count) * embedding_value_diff
-            self._fake_embeddings.embedding_values = interpolated_embedding_values
+            self.update_fake_embedding_values(interpolated_embedding_values)
             # forward
             outputs = self._model.forward(**instance_tensors)
             final_loss = outputs['loss'].item()
