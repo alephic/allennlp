@@ -26,7 +26,7 @@ class BertMCAttributionPredictor(Predictor):
     """
     Wrapper for the bert_mc_qa model.
     """
-    def __init__(self, model, dataset_reader, grad_sample_count=2000, baseline_type='zeros'):
+    def __init__(self, model, dataset_reader, grad_sample_count=100, baseline_type='zeros'):
         super().__init__(model, dataset_reader)
         self._grad = None
         self._device = next(self._model.parameters()).device
