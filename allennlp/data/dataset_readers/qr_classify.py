@@ -23,7 +23,7 @@ class QRClassifyDatasetReader(DatasetReader):
     
     def text_to_instance(self, text, label=None):
         fields = {
-            'text': TextField(list(map(Token, self._tokenizer.tokenize(text))), self._token_indexers)
+            'text': TextField(self._tokenizer.tokenize(text)), self._token_indexers)
         }
         if label is not None:
             fields['label'] = LabelField(self._label_map[label], skip_indexing=True)
