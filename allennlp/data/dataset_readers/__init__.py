@@ -37,3 +37,4 @@ from allennlp.data.dataset_readers.simple_language_modeling import SimpleLanguag
 from allennlp.data.dataset_readers.babi import BabiReader
 from allennlp.data.dataset_readers.copynet_seq2seq import CopyNetDatasetReader
 from allennlp.data.dataset_readers.text_classification_json import TextClassificationJsonReader
+from allennlp.data.dataset_readers.qr_classify import QRClassifyDatasetReader
