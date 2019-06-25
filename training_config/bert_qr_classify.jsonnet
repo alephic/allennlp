@@ -8,7 +8,7 @@ local bert_model = "bert-base-uncased";
             "word_splitter": "bert-basic"
         },
         "token_indexers": {
-            "bert": {
+            "tokens": {
                 "type": "bert-pretrained",
                 "pretrained_model": bert_model,
                 "max_pieces": 256
