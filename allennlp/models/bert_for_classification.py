@@ -9,6 +9,7 @@ from allennlp.models.model import Model
 from allennlp.modules.token_embedders.bert_token_embedder import PretrainedBertModel
 from allennlp.nn.initializers import InitializerApplicator
 from allennlp.training.metrics import CategoricalAccuracy
+import logging
 
 
 @Model.register("bert_for_classification")
@@ -122,7 +123,12 @@ class BertForClassification(Model):
         output_dict = {"logits": logits, "probs": probs}
 
         if label is not None:
-            loss = self._loss(logits, label.long().view(-1))
+            try:
+                loss = self._loss(logits, label.long().view(-1))
+            except RuntimeError:
+                logging.error(f'label: {repr(label)}')
+                raise RuntimeError()
+                
             output_dict["loss"] = loss
             self._accuracy(logits, label)
 
