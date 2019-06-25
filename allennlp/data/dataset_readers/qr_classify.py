@@ -13,7 +13,7 @@ class QRClassifyDatasetReader(DatasetReader):
             tokenizer = None,
             lazy: bool=False
         ):
-        super().__init__(self, lazy=lazy)
+        super().__init__(lazy=lazy)
         self._token_indexers = token_indexers
         self._tokenizer = tokenizer
         self._label_map = {'True': 1, 'Other': 1, 'False': 0}
