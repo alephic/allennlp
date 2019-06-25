@@ -2,15 +2,18 @@
 from allennlp.data.dataset_readers.dataset_reader import DatasetReader
 from allennlp.data.instance import Instance
 from allennlp.data.tokenizers.token import Token
+from allennlp.data.tokenizers import Tokenizer
+from allennlp.data.token_indexers import TokenIndexer
 from allennlp.data.fields import TextField, LabelField
 import json
+from typing import Dict
 
 @DatasetReader.register('qr_classify')
 class QRClassifyDatasetReader(DatasetReader):
     def __init__(
             self, 
-            token_indexers = None,
-            tokenizer = None,
+            token_indexers: Dict[str, TokenIndexer] = None,
+            tokenizer: Tokenizer = None,
             lazy: bool=False
         ):
         super().__init__(lazy=lazy)
