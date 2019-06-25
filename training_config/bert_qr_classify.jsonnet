@@ -20,7 +20,8 @@ local bert_model = "bert-base-uncased";
     "model": {
         "type": "bert_for_classification",
         "bert_model": bert_model,
-        "dropout": 0.2
+        "dropout": 0.2,
+        "num_labels": 2
     },
     "iterator": {
         "type": "bucket",

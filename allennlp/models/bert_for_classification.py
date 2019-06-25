@@ -123,11 +123,7 @@ class BertForClassification(Model):
         output_dict = {"logits": logits, "probs": probs}
 
         if label is not None:
-            try:
-                loss = self._loss(logits, label.long().view(-1))
-            except RuntimeError:
-                logging.error(f'logits.size(): {logits.size()}, input_ids.size(): {input_ids.size()}')
-                raise RuntimeError()
+            loss = self._loss(logits, label.long().view(-1))
                 
             output_dict["loss"] = loss
             self._accuracy(logits, label)
