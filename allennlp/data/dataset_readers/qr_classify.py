@@ -3,7 +3,6 @@ from allennlp.data.dataset_readers.dataset_reader import DatasetReader
 from allennlp.data.instance import Instance
 from allennlp.data.tokenizers.token import Token
 from allennlp.data.fields import TextField, LabelField
-from allennlp.common.override import override
 import json
 
 @DatasetReader.register('qr_classify')
@@ -27,7 +26,6 @@ class QRClassifyDatasetReader(DatasetReader):
             fields['label'] = LabelField(self._label_map[label], skip_indexing=True)
         return Instance(fields)
     
-    @override
     def _read(self, file_path):
         with open(file_path, 'r') as f:
             for line in f:
