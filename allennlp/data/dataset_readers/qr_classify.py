@@ -7,6 +7,7 @@ from allennlp.data.token_indexers import TokenIndexer
 from allennlp.data.fields import TextField, LabelField
 import json
 from typing import Dict
+import logging
 
 @DatasetReader.register('qr_classify')
 class QRClassifyDatasetReader(DatasetReader):
@@ -27,6 +28,7 @@ class QRClassifyDatasetReader(DatasetReader):
         }
         if label is not None:
             fields['label'] = LabelField(self._label_map[label], skip_indexing=True)
+        logging.info(fields)
         return Instance(fields)
     
     def _read(self, file_path):
