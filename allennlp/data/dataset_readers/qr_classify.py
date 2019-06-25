@@ -9,8 +9,8 @@ import json
 class QRClassifyDatasetReader(DatasetReader):
     def __init__(
             self, 
-            token_indexers: Dict[str, TokenIndexer] = None,
-            tokenizer: Tokenizer = None,
+            token_indexers = None,
+            tokenizer = None,
             lazy: bool=False
         ):
         super().__init__(self, lazy=lazy)
