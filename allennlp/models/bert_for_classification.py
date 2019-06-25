@@ -126,7 +126,7 @@ class BertForClassification(Model):
             try:
                 loss = self._loss(logits, label.long().view(-1))
             except RuntimeError:
-                logging.error(f'label: {repr(label)}')
+                logging.error(f'logits.size(): {logits.size()}')
                 raise RuntimeError()
                 
             output_dict["loss"] = loss
