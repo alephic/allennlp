@@ -5,6 +5,7 @@ import torch
 from allennlp.modules.text_field_embedders import TextFieldEmbedder
 from allennlp.training.metrics import CategoricalAccuracy
 from allennlp.nn.util import get_text_field_mask
+from typing import Dict
 
 @Model.register('logistic_regression')
 class LogisticRegression(Model):
