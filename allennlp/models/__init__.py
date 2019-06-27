@@ -34,3 +34,4 @@ from allennlp.models.bidirectional_lm import BidirectionalLanguageModel
 from allennlp.models.language_model import LanguageModel
 from allennlp.models.basic_classifier import BasicClassifier
 from allennlp.models.srl_bert import SrlBert
+from allennlp.models.logistic_regression import LogisticRegression
