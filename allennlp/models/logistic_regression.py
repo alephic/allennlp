@@ -18,8 +18,7 @@ class LogisticRegression(Model):
     def forward(self, tokens: Dict[str, torch.Tensor], label: torch.Tensor = None):
         mask = get_text_field_mask(tokens)
         embedded = self.text_field_embedder(tokens)
-        embedded = embedded.view(-1, embedded.size(-1))
-        logits = self.linear(embedded)
+        logits = self.linear(embedded.view(-1, embedded.size(-1)))
         logits = logits.view(embedded.size(0), embedded.size(1), -1)
         logits = logits.sum(dim=1) / mask.sum(dim=1).unsqueeze(-1).float()
         output_dict = {'logits': logits}
