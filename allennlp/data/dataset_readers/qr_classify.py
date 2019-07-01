@@ -19,14 +19,14 @@ class QRClassifyDatasetReader(DatasetReader):
         super().__init__(lazy=lazy)
         self._token_indexers = token_indexers
         self._tokenizer = tokenizer
-        self._label_map = {'True': 1, 'Other': 1, 'False': 0}
+        self._label_map = {'true': 1, 'other': 1, 'false': 0}
     
     def text_to_instance(self, text, label=None):
         fields = {
             'tokens': TextField(self._tokenizer.tokenize(text), self._token_indexers)
         }
         if label is not None:
-            fields['label'] = LabelField(self._label_map[label], skip_indexing=True)
+            fields['label'] = LabelField(self._label_map[label.lower()], skip_indexing=True)
         return Instance(fields)
     
     def _read(self, file_path):
